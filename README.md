@@ -1,6 +1,6 @@
 **Copyright 2022 Netskope Inc**
 
-# This repo contains transaction event logs related sample codes
+# This repo contains transaction event logs related sample code
 
 ## 1. txlog_subscriber_sample.py
 
@@ -57,3 +57,6 @@ timestamp is the last argument which is required if the second argument is 'PUBL
   - timestamp in format 'YYYY-MM-DD HH:MM:SS.fff, (.fff) is optional, e.g.'2011-11-04 00:05:23'
 
 ```
+
+# References
+https://docs.netskope.com/en/transaction-events.html
