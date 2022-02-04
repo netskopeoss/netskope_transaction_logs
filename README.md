@@ -15,7 +15,7 @@ Example:
 python txlog_subscriber_sample.py projects/123/locations/us-west1-a/subscriptions/my_subscription 600
 ```
 
-## 2. txlog_subscriber_seek_target_sample
+## 2. txlog_subscriber_seek_target_sample.py
 
 To use:
 
