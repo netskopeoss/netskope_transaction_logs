@@ -13,8 +13,9 @@
 # limitations under the License.
 
 # To use:
-# 1. python3 txlog_subscriber_seek_target_sample.py -p <subscription_path> -t <timestamp_type> -s <timestamp>
-# 2. example: 
+# 1. export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
+# 2. python3 txlog_subscriber_seek_target_sample.py -p <subscription_path> -t <timestamp_type> -s <timestamp>
+# 3. example: 
 #    python3 txlog_subscriber_seek_target_sample.py -p projects/123/locations/us-west1-a/subscriptions/my_subscription -t PUBLISH -s "2022-02-02 15:40:00"
 #    python3 txlog_subscriber_seek_target_sample.py -p projects/123/locations/us-west1-a/subscriptions/my_subscription -t EVENT -s "2022-02-02 15:40:00"
 #    python3 txlog_subscriber_seek_target_sample.py -p projects/123/locations/us-west1-a/subscriptions/my_subscription -t BEGIN
