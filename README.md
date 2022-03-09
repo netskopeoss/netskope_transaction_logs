@@ -2,6 +2,10 @@
 
 # This repo contains transaction event logs related sample code
 
+## Prerequisites
+* google-cloud-pubsublite module is required to use sample code
+* You can find the python version here : https://pypi.org/project/google-cloud-pubsublite/
+
 ## 1. txlog_subscriber_sample.py
 
 To use:
