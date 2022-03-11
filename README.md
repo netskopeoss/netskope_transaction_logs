@@ -7,6 +7,7 @@
 * You can find the python version here : https://pypi.org/project/google-cloud-pubsublite/
 
 ## 1. txlog_subscriber_sample.py
+### This is used to subscribe data from a subscribtion.
 
 To use:
 
@@ -20,6 +21,7 @@ python txlog_subscriber_sample.py projects/123/locations/us-west1-a/subscription
 ```
 
 ## 2. txlog_subscriber_seek_target_sample.py
+### This is used to move the cursor to a customized point, then start to read data there.
 
 To use:
 
