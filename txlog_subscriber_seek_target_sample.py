@@ -45,7 +45,11 @@ def move_cursor(project_number, cloud_region, zone_id, subscription_id, timestam
         return
 
     print(f"try to move seek cursor to {ts}")
-    location = CloudZone(CloudRegion(cloud_region), zone_id)
+    if zone_id:
+        location = CloudZone(CloudRegion(cloud_region), zone_id)
+    else:
+        location = CloudRegion(cloud_region)
+
     subscription_path = SubscriptionPath(
         project_number, location, subscription_id)
 
@@ -92,7 +96,7 @@ timestamp is the last argument which is required if the second argument is 'PUBL
         move_cursor(
             parts[1],
             location[0] + '-' + location[1],
-            location[2],
+            location[2] if len(location) > 2 else None,
             parts[5],
             args.timestamp_type,
             args.timestamp,

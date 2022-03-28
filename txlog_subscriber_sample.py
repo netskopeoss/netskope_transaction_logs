@@ -23,6 +23,7 @@ from google.cloud.pubsublite.types import MessageMetadata
 from google.pubsub_v1 import PubsubMessage
 import gzip
 
+
 # Sample Python Subscriber to Netskope Transaction Events.
 def receive_messages(
     project_number, cloud_region, zone_id, subscription_id, timeout=90
@@ -36,7 +37,11 @@ def receive_messages(
         SubscriptionPath,
     )
 
-    location = CloudZone(CloudRegion(cloud_region), zone_id)
+    if zone_id:
+        location = CloudZone(CloudRegion(cloud_region), zone_id)
+    else:
+        location = CloudRegion(cloud_region)
+
     subscription_path = SubscriptionPath(
         project_number, location, subscription_id)
     per_partition_flow_control_settings = FlowControlSettings(
@@ -48,7 +53,6 @@ def receive_messages(
         metadata = MessageMetadata.decode(message.message_id)
         print(
             f"\n\nReceived msg at {datetime.datetime.now()} with partition {metadata.partition} offset {str(metadata.cursor).strip()}")
-
         print("Atrributes:")
         print(f"Content-Encoding: {message.attributes['Content-Encoding']}")
         print(f"Log-Count: {message.attributes['Log-Count']}")
@@ -60,9 +64,7 @@ def receive_messages(
             print(f"{event.decode('utf-8')}")
         except:
             pass
-
         message.ack()
-
 
     with SubscriberClient() as subscriber_client:
 
@@ -103,7 +105,7 @@ if __name__ == "__main__":
     receive_messages(
         parts[1],
         location[0] + '-' + location[1],
-        location[2],
+        location[2] if len(location) > 2 else None,
         parts[5],
         args.timeout,
     )
