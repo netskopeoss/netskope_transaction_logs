@@ -22,7 +22,9 @@ import datetime
 from google.cloud.pubsublite.types import MessageMetadata
 from google.pubsub_v1 import PubsubMessage
 import gzip
+import threading
 
+g_print_lock = threading.Lock()
 
 # Sample Python Subscriber to Netskope Transaction Events.
 def receive_messages(
@@ -50,21 +52,30 @@ def receive_messages(
     )
 
     def callback(message: PubsubMessage):
+        # Due to thread safety, we need to accumulate the data and print at once
+        # or output would be interleaved
+        buffer = []
         metadata = MessageMetadata.decode(message.message_id)
-        print(
+        buffer.append(
             f"\n\nReceived msg at {datetime.datetime.now()} with partition {metadata.partition} offset {str(metadata.cursor).strip()}")
-        print("Atrributes:")
-        print(f"Content-Encoding: {message.attributes['Content-Encoding']}")
-        print(f"Log-Count: {message.attributes['Log-Count']}")
-        print(f"Fields: {message.attributes['Fields']}")
+        buffer.append("Atrributes:")
+        buffer.append(f"Content-Encoding: {message.attributes['Content-Encoding']}")
+        buffer.append(f"Log-Count: {message.attributes['Log-Count']}")
+        buffer.append(f"Fields: {message.attributes['Fields']}")
         # for testing purpose, some data may not be gzip data, hence pass that case
         try:
             event = gzip.decompress(message.data)
-            print("Transaction event:")
-            print(f"{event.decode('utf-8')}")
+            buffer.append("Transaction event:")
+            buffer.append(f"{event.decode('utf-8')}")
         except:
             pass
         message.ack()
+
+        # Print out all msgs at once while holding the print lock
+        with g_print_lock:
+            for str in buffer:
+                print(str)
+
 
     with SubscriberClient() as subscriber_client:
 
