@@ -26,9 +26,10 @@ import threading
 
 g_print_lock = threading.Lock()
 
+
 # Sample Python Subscriber to Netskope Transaction Events.
 def receive_messages(
-    project_number, cloud_region, zone_id, subscription_id, timeout=90
+        project_number, cloud_region, zone_id, subscription_id, timeout=90
 ):
     from concurrent.futures._base import TimeoutError
     from google.cloud.pubsublite.cloudpubsub import SubscriberClient
@@ -40,12 +41,12 @@ def receive_messages(
     )
 
     if zone_id:
-        location = CloudZone(CloudRegion(cloud_region), zone_id)
+        loc = CloudZone(CloudRegion(cloud_region), zone_id)
     else:
-        location = CloudRegion(cloud_region)
+        loc = CloudRegion(cloud_region)
 
     subscription_path = SubscriptionPath(
-        project_number, location, subscription_id)
+        project_number, loc, subscription_id)
     per_partition_flow_control_settings = FlowControlSettings(
         messages_outstanding=1000,
         bytes_outstanding=10 * 1024 * 1024,
@@ -55,30 +56,32 @@ def receive_messages(
         # Due to thread safety, we need to accumulate the data and print at once
         # or output would be interleaved
         buffer = []
-        metadata = MessageMetadata.decode(message.message_id)
-        buffer.append(
-            f"\n\nReceived msg at {datetime.datetime.now()} with partition {metadata.partition} offset {str(metadata.cursor).strip()}")
-        buffer.append("Atrributes:")
-        buffer.append(f"Content-Encoding: {message.attributes['Content-Encoding']}")
-        buffer.append(f"Log-Count: {message.attributes['Log-Count']}")
-        buffer.append(f"Fields: {message.attributes['Fields']}")
+        try:
+            metadata = MessageMetadata.decode(message.message_id)
+            buffer.append(
+                f"\n\nReceived msg at {datetime.datetime.now()} with partition {metadata.partition} offset {str(metadata.cursor).strip()}")
+            buffer.append("Atrributes:")
+            buffer.append(f"Content-Encoding: {message.attributes['Content-Encoding']}")
+            buffer.append(f"Log-Count: {message.attributes['Log-Count']}")
+            buffer.append(f"Fields: {message.attributes['Fields']}")
+        except Exception as e:
+            print(e)
         # for testing purpose, some data may not be gzip data, hence pass that case
         try:
             event = gzip.decompress(message.data)
             buffer.append("Transaction event:")
             buffer.append(f"{event.decode('utf-8')}")
-        except:
+        except Exception as e:
+            print(e)
             pass
         message.ack()
 
         # Print out all msgs at once while holding the print lock
         with g_print_lock:
-            for str in buffer:
-                print(str)
-
+            for buf in buffer:
+                print(buf)
 
     with SubscriberClient() as subscriber_client:
-
         streaming_pull_future = subscriber_client.subscribe(
             subscription_path,
             callback=callback,
